@@ -1,5 +1,5 @@
 #pragma once
-#include <Arduboy2.h>
+
 namespace balls {
 
 struct Point {
@@ -9,7 +9,7 @@ struct Point {
 
 struct Object : Point {
     virtual ~Object() {};
-    virtual void draw(Arduboy2& ard) ;
+    virtual void draw() ;
     virtual bool touches(Object& o) ;
 };
 

@@ -7,7 +7,7 @@ namespace balls {
         return false;
     }
 
-    void Object::draw(Arduboy2& a)  {
+    void Object::draw()  {
 
     }
 }

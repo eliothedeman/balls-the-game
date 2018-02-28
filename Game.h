@@ -3,17 +3,20 @@
 #include "Object.h"
 #include <Arduboy2.h>
 
-namespace balls {
+namespace balls
+{
 
-struct Ball : Object {
-  void draw(Arduboy2 &a) override;
+struct Ball : Object
+{
+  void draw() override;
   bool touches(Object &o) override;
 };
 
-struct Player : Object {
+struct Player : Object
+{
   Player(uint8_t n);
   ~Player(){};
-  void draw(Arduboy2 &a) override;
+  void draw() override;
   bool touches(Object &o) override;
 
   Ball static_ball_1;
@@ -23,7 +26,8 @@ struct Player : Object {
   uint8_t score = 0;
 };
 
-enum State {
+enum State
+{
   P1_STATIC_1 = 0,
   P1_STATIC_2 = 1,
   P1_GAME_BALL = 2,
@@ -34,10 +38,11 @@ enum State {
   DISPLAY_WINNER = 7
 };
 
-struct Game : Object {
+struct Game : Object
+{
   Game();
   ~Game(){};
-  void draw(Arduboy2 &a) override;
+  void draw() override;
   void simulate();
   Player player1;
   Player player2;
