@@ -5,32 +5,88 @@
 namespace balls
 {
 
-static int placeBall(Ball &b)
+static int placeGameBall(Player *p)
 {
-    A.pollButtons();
 
-    if (A.pressed(A_BUTTON))
+    // TODO: get this right you idiot
+    auto offset = p->player_num - 1;
+    offset = offset * WIDTH;
+    if (offset > 0)
+    {
+        offset -= BALL_RADIUS;
+    }
+    p->game_ball.x = offset;
+
+    if (A.justPressed(A_BUTTON))
     {
         return 1;
     }
     if (A.pressed(UP_BUTTON))
     {
-        b.y--;
+        p->game_ball.y--;
     }
     if (A.pressed(DOWN_BUTTON))
     {
-        b.y++;
+        p->game_ball.y++;
+    }
+    return 0;
+}
+
+static int placeBall(Player *p)
+{
+
+    Ball *b;
+    switch (p->ballState)
+    {
+    case NoBalls:
+        p->ballState = Static_1;
+    case Static_1:
+        b = &p->static_ball_1;
+        break;
+    case Static_2:
+        b = &p->static_ball_2;
+        break;
+    case GameBall:
+        return placeGameBall(p);
+        break;
+    default:
+        A.print("ERROR");
+        A.print(p->ballState);
+        return 0;
+    }
+
+    if (A.justPressed(A_BUTTON))
+    {
+        p->ballState++;
+        return 0;
+    }
+    if (A.pressed(UP_BUTTON))
+    {
+        b->y--;
+    }
+    if (A.pressed(DOWN_BUTTON))
+    {
+        b->y++;
     }
     if (A.pressed(LEFT_BUTTON))
     {
-        b.x--;
+        b->x--;
     }
     if (A.pressed(RIGHT_BUTTON))
     {
-        b.x++;
+        b->x++;
     }
 
     return 0;
+}
+
+static bool simulateFrame(Game *g)
+{
+    auto &p1 = g->player1;
+    auto &p2 = g->player2;
+
+    p1.game_ball.y--;
+    p2.game_ball.y--;
 }
 
 void Game::simulate()
@@ -38,26 +94,20 @@ void Game::simulate()
     int stateChange = 0;
     switch (current_state)
     {
-    case State::P1_STATIC_1:
-        stateChange = placeBall(player1.static_ball_1);
+    case GAME_START:
+        stateChange += 1;
         break;
-    case State::P1_STATIC_2:
-        stateChange = placeBall(player1.static_ball_2);
+    case P1_PLACE_BALLS:
+        stateChange = placeBall(&player1);
         break;
-    case State::P1_GAME_BALL:
-        stateChange = placeBall(player1.game_ball);
+    case P2_PLACE_BALLS:
+        stateChange = placeBall(&player2);
         break;
-    case State::P2_STATIC_1:
-        stateChange = placeBall(player2.static_ball_1);
+    case PLAY_GAME:
+        simulateFrame(this);
+    case UPDATE_SCORE:
         break;
-    case State::P2_STATIC_2:
-        stateChange = placeBall(player2.static_ball_2);
-        break;
-    case State::P2_GAME_BALL:
-        stateChange = placeBall(player2.game_ball);
-    case State::UPDATE_SCORE:
-        break;
-    case State::DISPLAY_WINNER:
+    case DISPLAY_WINNER:
         break;
     }
 
@@ -71,7 +121,7 @@ void Game::draw()
 
 Game::Game() : player1(1), player2(2)
 {
-    current_state = State::P1_STATIC_1;
+    current_state = 0;
 }
 
 Player::Player(uint8_t n)
@@ -96,10 +146,17 @@ void Player::draw()
     A.setCursor(y, x);
     A.print(score);
 
-    // draw balls this player owns
-    static_ball_1.draw();
-    static_ball_2.draw();
-    game_ball.draw();
+    switch (ballState)
+    {
+    case GameBall:
+        game_ball.draw();
+    case Static_2:
+        static_ball_2.draw();
+    case Static_1:
+        static_ball_1.draw();
+    case NoBalls:
+        break;
+    }
 }
 
 bool Player::touches(Object &o)
@@ -109,7 +166,7 @@ bool Player::touches(Object &o)
 
 void Ball::draw()
 {
-    A.drawCircle(x, y, 5);
+    A.drawCircle(x, y, BALL_RADIUS);
 }
 
 bool Ball::touches(Object &o)

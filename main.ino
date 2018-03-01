@@ -2,9 +2,7 @@
 #include "singletons.h"
 #include "Game.h"
 
-// make an instance of arduboy used for many functions
-balls::Game ballGame;
-
+balls::Game game;
 
 
 // This function runs once in your game.
@@ -29,12 +27,14 @@ void loop() {
     return;
   }
 
+  balls::A.pollButtons();
+
   // run the simulation
-  ballGame.simulate();
+  game.simulate();
 
   // first we clear our screen to black
   balls::A.clear();
-  ballGame.draw();
+  game.draw();
   balls::A.setCursor(WIDTH -5, HEIGHT - 10);
   balls::A.print(balls::A.cpuLoad());
 
