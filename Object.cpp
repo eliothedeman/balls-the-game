@@ -3,10 +3,6 @@
 
 namespace balls {
 
-    bool Object::touches(Object& o)  {
-        return false;
-    }
-
     void Object::draw()  {
 
     }

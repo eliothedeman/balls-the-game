@@ -80,13 +80,43 @@ static int placeBall(Player *p)
     return 0;
 }
 
-static bool simulateFrame(Game *g)
-{
-    auto &p1 = g->player1;
-    auto &p2 = g->player2;
+void Ball::move() {
+    x += v.x;
+    y += v.y;
+}
 
-    p1.game_ball.y--;
-    p2.game_ball.y--;
+static void simBalls(Ball** b) {
+    for (auto i = 0; i < 6; i++) {
+        for (auto j = 0; j < 6; j++) {
+            if (i == j) {
+                continue;
+            }
+            if (b[i]->touches(b[j])) {
+                b[i]->v.x *= -1;
+                b[i]->v.y *= -1;
+            }
+        }
+    }
+
+    for (auto i = 0; i < 6; i++) {
+        b[i]->move();
+    }
+}
+
+static void fillBallArray(Player& p1, Player& p2, Ball** b) {
+    b[0] = &p1.game_ball;
+    b[1] = &p1.static_ball_1;
+    b[2] = &p1.static_ball_2;
+    b[3] = &p2.game_ball;
+    b[4] = &p2.static_ball_1;
+    b[5] = &p2.static_ball_2;
+}
+
+static void simulateFrame(Game *g)
+{
+    static Ball* b[6];
+    fillBallArray(g->player1, g->player2, b);
+    simBalls(b);
 }
 
 void Game::simulate()
@@ -99,9 +129,11 @@ void Game::simulate()
         break;
     case P1_PLACE_BALLS:
         stateChange = placeBall(&player1);
+        player1.game_ball.v.x = 1;
         break;
     case P2_PLACE_BALLS:
         stateChange = placeBall(&player2);
+        player2.game_ball.v.x = -1;
         break;
     case PLAY_GAME:
         simulateFrame(this);
@@ -159,18 +191,17 @@ void Player::draw()
     }
 }
 
-bool Player::touches(Object &o)
-{
-    return false;
-}
 
 void Ball::draw()
 {
     A.drawCircle(x, y, BALL_RADIUS);
 }
 
-bool Ball::touches(Object &o)
+bool Ball::touches(const Ball* b)
 {
-    return false;
+    auto tx = abs(x - b->x);
+    auto ty = abs(y - b->y);
+    auto distance = tx + ty;
+    return distance < BALL_DIAMETER;
 }
 }

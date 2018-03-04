@@ -7,16 +7,20 @@ namespace balls
 {
 
 const int8_t BALL_RADIUS = 5;
+const int8_t BALL_DIAMETER = 2 * BALL_RADIUS;
 
 struct Ball : Object
 {
   Ball() {
     x = WIDTH / 2;
     y = HEIGHT / 2;
+    isStatic = true;
   }
   void draw() override;
-  bool touches(Object &o) override;
+  bool touches(const Ball *b);
+  void move();
   Vector v;
+  bool isStatic;
 };
 
 const int8_t NoBalls = 0;
@@ -29,7 +33,6 @@ struct Player : Object
   Player(uint8_t n);
   ~Player(){};
   void draw() override;
-  bool touches(Object &o) override;
 
   Ball static_ball_1;
   Ball static_ball_2;

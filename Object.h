@@ -10,7 +10,6 @@ struct Point {
 struct Object : Point {
     virtual ~Object() {};
     virtual void draw() ;
-    virtual bool touches(Object& o) ;
 };
 
 struct Vector : Point {
