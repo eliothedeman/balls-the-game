@@ -1,6 +1,5 @@
 {
     "board": "arduino:avr:leonardo",
     "port": "COM3",
-    "sketch": "main.ino",
-    "output": "build"
+    "sketch": "balls-the-game.ino"
 }

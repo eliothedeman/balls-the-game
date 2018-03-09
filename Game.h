@@ -1,46 +1,12 @@
-#pragma once
-
+#ifndef _H_GAME
+#define _H_GAME
 #include <Arduboy2.h>
 #include "Object.h"
+#include "Player.h"
+#include "Ball.h"
 
 namespace balls
 {
-
-const int8_t BALL_RADIUS = 5;
-const int8_t BALL_DIAMETER = 2 * BALL_RADIUS;
-
-struct Ball : Object
-{
-  Ball() {
-    x = WIDTH / 2;
-    y = HEIGHT / 2;
-    isStatic = true;
-  }
-  void draw() override;
-  bool touches(const Ball *b);
-  void move();
-  Vector v;
-  bool isStatic;
-};
-
-const int8_t NoBalls = 0;
-const int8_t Static_1 = 1;
-const int8_t Static_2 = 2;
-const int8_t GameBall = 3;
-
-struct Player : Object
-{
-  Player(uint8_t n);
-  ~Player(){};
-  void draw() override;
-
-  Ball static_ball_1;
-  Ball static_ball_2;
-  Ball game_ball;
-  int8_t player_num;
-  int8_t score = 0;
-  int8_t ballState = 0;
-};
 
 const int8_t GAME_START = 0;
 const int8_t P1_PLACE_BALLS = 1;
@@ -53,10 +19,13 @@ struct Game : Object
 {
   Game();
   ~Game(){};
-  void draw() override;
+  void input(A&);
   void simulate();
+  void draw(A&) override;
   Player player1;
   Player player2;
   int8_t current_state;
 };
 } // namespace balls
+
+#endif

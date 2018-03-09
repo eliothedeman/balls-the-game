@@ -1,109 +1,112 @@
 #include "Game.h"
 #include "Object.h"
-#include "singletons.h"
 
 namespace balls
 {
 
-static int placeGameBall(Player *p)
+static int placeGameBall(A &a, Player &p)
 {
 
     // TODO: get this right you idiot
-    auto offset = p->player_num - 1;
+    auto offset = p.player_num - 1;
     offset = offset * WIDTH;
     if (offset > 0)
     {
         offset -= BALL_RADIUS;
     }
-    p->game_ball.x = offset;
 
-    if (A.justPressed(A_BUTTON))
+    p.game_ball.x = SCALE_UP(offset);
+    p.game_ball.v = V_STATIC;
+
+    if (a.justPressed(A_BUTTON))
     {
+        p.game_ball.v = V_STATIC;
         return 1;
     }
-    if (A.pressed(UP_BUTTON))
+    if (a.pressed(UP_BUTTON))
     {
-        p->game_ball.y--;
+        p.game_ball.v = V_UP;
     }
-    if (A.pressed(DOWN_BUTTON))
+    if (a.pressed(DOWN_BUTTON))
     {
-        p->game_ball.y++;
+        p.game_ball.v = V_DOWN;
     }
     return 0;
 }
 
-static int placeBall(Player *p)
+static int placeBall(A &a, Player &p)
 {
 
     Ball *b;
-    switch (p->ballState)
+    switch (p.ballState)
     {
     case NoBalls:
-        p->ballState = Static_1;
+        p.ballState = Static_1;
     case Static_1:
-        b = &p->static_ball_1;
+        b = &p.static_ball_1;
         break;
     case Static_2:
-        b = &p->static_ball_2;
+        b = &p.static_ball_2;
         break;
     case GameBall:
-        return placeGameBall(p);
+        return placeGameBall(a, p);
         break;
     default:
-        A.print("ERROR");
-        A.print(p->ballState);
+        a.print("ERROR");
+        a.print(p.ballState);
         return 0;
     }
 
-    if (A.justPressed(A_BUTTON))
+    auto v = V_STATIC;
+    if (a.justPressed(A_BUTTON))
     {
-        p->ballState++;
+        b->v = v;
+        p.ballState++;
         return 0;
     }
-    if (A.pressed(UP_BUTTON))
+    if (a.pressed(UP_BUTTON))
     {
-        b->y--;
+        v = V_UP;
     }
-    if (A.pressed(DOWN_BUTTON))
+    if (a.pressed(DOWN_BUTTON))
     {
-        b->y++;
+        v = V_DOWN;
     }
-    if (A.pressed(LEFT_BUTTON))
+    if (a.pressed(LEFT_BUTTON))
     {
-        b->x--;
+        v = V_LEFT;
     }
-    if (A.pressed(RIGHT_BUTTON))
+    if (a.pressed(RIGHT_BUTTON))
     {
-        b->x++;
+        v = V_RIGHT;
     }
+    b->v = v;
 
     return 0;
 }
 
-void Ball::move() {
-    x += v.x;
-    y += v.y;
-}
-
-static void simBalls(Ball** b) {
-    for (auto i = 0; i < 6; i++) {
-        for (auto j = 0; j < 6; j++) {
-            if (i == j) {
+static void simBalls(Ball **b)
+{
+    for (auto i = 0; i < 6; i++)
+    {
+        for (auto j = 0; j < 6; j++)
+        {
+            if (i == j)
+            {
                 continue;
             }
-            if (b[i]->touches(b[j])) {
+            if (b[i]->touches(*b[j]))
+            {
                 b[i]->v.x *= -1;
                 b[i]->v.y *= -1;
             }
         }
     }
 
-    for (auto i = 0; i < 6; i++) {
-        b[i]->move();
-    }
 }
 
-static void fillBallArray(Player& p1, Player& p2, Ball** b) {
+static void fillBallArray(Player &p1, Player &p2, Ball **b)
+{
     b[0] = &p1.game_ball;
     b[1] = &p1.static_ball_1;
     b[2] = &p1.static_ball_2;
@@ -112,14 +115,22 @@ static void fillBallArray(Player& p1, Player& p2, Ball** b) {
     b[5] = &p2.static_ball_2;
 }
 
-static void simulateFrame(Game *g)
+void Game::simulate()
 {
-    static Ball* b[6];
-    fillBallArray(g->player1, g->player2, b);
-    simBalls(b);
+    static Ball *b[6];
+    fillBallArray(player1, player2, b);
+
+    if (current_state == PLAY_GAME) {
+        simBalls(b);
+    }
+
+    for (auto i = 0; i < 6; i++)
+    {
+        b[i]->move();
+    }
 }
 
-void Game::simulate()
+void Game::input(A &a)
 {
     int stateChange = 0;
     switch (current_state)
@@ -128,80 +139,26 @@ void Game::simulate()
         stateChange += 1;
         break;
     case P1_PLACE_BALLS:
-        stateChange = placeBall(&player1);
-        player1.game_ball.v.x = 1;
+        stateChange = placeBall(a, player1);
+        player1.game_ball.v = V_RIGHT;
         break;
     case P2_PLACE_BALLS:
-        stateChange = placeBall(&player2);
-        player2.game_ball.v.x = -1;
-        break;
-    case PLAY_GAME:
-        simulateFrame(this);
-    case UPDATE_SCORE:
-        break;
-    case DISPLAY_WINNER:
+        stateChange = placeBall(a, player2);
+        player2.game_ball.v = V_LEFT;
         break;
     }
 
     current_state += stateChange;
 }
-void Game::draw()
+
+void Game::draw(A &a)
 {
-    player1.draw();
-    player2.draw();
+    player1.draw(a);
+    player2.draw(a);
 }
 
 Game::Game() : player1(1), player2(2)
 {
     current_state = 0;
-}
-
-Player::Player(uint8_t n)
-{
-    player_num = n;
-    x = 5;
-    switch (n)
-    {
-    case 1:
-        y = 0;
-        break;
-    case 2:
-        y = 120;
-        break;
-    }
-}
-
-void Player::draw()
-{
-
-    // print score
-    A.setCursor(y, x);
-    A.print(score);
-
-    switch (ballState)
-    {
-    case GameBall:
-        game_ball.draw();
-    case Static_2:
-        static_ball_2.draw();
-    case Static_1:
-        static_ball_1.draw();
-    case NoBalls:
-        break;
-    }
-}
-
-
-void Ball::draw()
-{
-    A.drawCircle(x, y, BALL_RADIUS);
-}
-
-bool Ball::touches(const Ball* b)
-{
-    auto tx = abs(x - b->x);
-    auto ty = abs(y - b->y);
-    auto distance = tx + ty;
-    return distance < BALL_DIAMETER;
 }
 }
