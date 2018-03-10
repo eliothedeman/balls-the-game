@@ -41,8 +41,8 @@ Vector &Vector::operator+=(const Vector &v)
 }
 
 Vector V_STATIC(0, 0);
-Vector V_UP(0, SCALE_UP(-1));
-Vector V_DOWN(0, SCALE_UP(1));
-Vector V_LEFT(SCALE_UP(-1), 0);
-Vector V_RIGHT(SCALE_UP(1), 0);
+Vector V_UP(0, -1);
+Vector V_DOWN(0, 1);
+Vector V_LEFT(-1, 0);
+Vector V_RIGHT(1, 0);
 }

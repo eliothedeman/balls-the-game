@@ -11,15 +11,12 @@ Ball::Ball() : v(0, 0) {
 }
 void Ball::move()
 {
-    if (isStatic) {
-        return;
-    }
     x += v.x;
     y += v.y;
 }
 void Ball::draw(A &a)
 {
-    a.drawCircle(SCALE_DOWN(x), SCALE_DOWN(y), BALL_RADIUS);
+    a.drawCircle(x, y, BALL_RADIUS);
 }
 
 bool Ball::touches(const Ball &b)

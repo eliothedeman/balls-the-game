@@ -1,23 +1,17 @@
 {
     "configurations": [
         {
-            "name": "Win32",
+            "name": "Linux",
             "includePath": [
-                "C:/Users/eliot/Documents/Arduino/libraries/Arduboy2/src",
-                "C:/Users/eliot/AppData/Local/Arduino15/packages/arduino/hardware/avr/1.6.21/cores/arduino",
-                "C:/Users/eliot/AppData/Local/Arduino15/packages/arduino/tools/avr-gcc/4.9.2-atmel3.5.4-arduino2/avr/include",
-                "C:/Users/eliot/Documents/Arduino/balls-the-game"
+                "/home/eliot/.arduino15/packages/arduino/hardware/avr/1.6.21/cores/arduino"
             ],
             "browse": {
                 "limitSymbolsToIncludedHeaders": false,
                 "path": [
-                    "C:/Users/eliot/Documents/Arduino/libraries/Arduboy2/src",
-                    "C:/Users/eliot/AppData/Local/Arduino15/packages/arduino/hardware/avr/1.6.21/cores/arduino",
-                "C:/Users/eliot/AppData/Local/Arduino15/packages/arduino/tools/avr-gcc/4.9.2-atmel3.5.4-arduino2/avr/include",
-                    "C:/Users/eliot/Documents/Arduino/balls-the-game"
+                    "/home/eliot/.arduino15/packages/arduino/hardware/avr/1.6.21/cores/arduino"
                 ]
             },
-            "intelliSenseMode": "msvc-x64"
+            "intelliSenseMode": "clang-x64"
         }
     ],
     "version": 3

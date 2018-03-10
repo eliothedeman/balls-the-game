@@ -15,7 +15,7 @@ static int placeGameBall(A &a, Player &p)
         offset -= BALL_RADIUS;
     }
 
-    p.game_ball.x = SCALE_UP(offset);
+    p.game_ball.x = offset;
     p.game_ball.v = V_STATIC;
 
     if (a.justPressed(A_BUTTON))
@@ -108,9 +108,9 @@ static void simBalls(Ball **b)
 static void fillBallArray(Player &p1, Player &p2, Ball **b)
 {
     b[0] = &p1.game_ball;
-    b[1] = &p1.static_ball_1;
-    b[2] = &p1.static_ball_2;
-    b[3] = &p2.game_ball;
+    b[1] = &p2.game_ball;
+    b[2] = &p1.static_ball_1;
+    b[3] = &p1.static_ball_2;
     b[4] = &p2.static_ball_1;
     b[5] = &p2.static_ball_2;
 }
@@ -119,14 +119,16 @@ void Game::simulate()
 {
     static Ball *b[6];
     fillBallArray(player1, player2, b);
+    auto i = 0;
 
     if (current_state == PLAY_GAME) {
+        i = 0;
         simBalls(b);
     }
 
-    for (auto i = 0; i < 6; i++)
-    {
+    while (i < 6) {
         b[i]->move();
+        i++;
     }
 }
 
@@ -140,11 +142,13 @@ void Game::input(A &a)
         break;
     case P1_PLACE_BALLS:
         stateChange = placeBall(a, player1);
-        player1.game_ball.v = V_RIGHT;
         break;
     case P2_PLACE_BALLS:
         stateChange = placeBall(a, player2);
-        player2.game_ball.v = V_LEFT;
+        if (stateChange > 0) {
+            player1.game_ball.v = V_RIGHT;
+            player2.game_ball.v = V_LEFT;
+        }
         break;
     }
 

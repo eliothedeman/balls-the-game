@@ -1,5 +1,5 @@
 {
     "board": "arduino:avr:leonardo",
-    "port": "COM3",
+    "port": "/dev/ttyACM0",
     "sketch": "balls-the-game.ino"
 }
