@@ -8,11 +8,14 @@ static int placeGameBall(A &a, Player &p)
 {
 
     // TODO: get this right you idiot
-    auto offset = p.player_num - 1;
-    offset = offset * WIDTH;
-    if (offset > 0)
-    {
-        offset -= BALL_RADIUS;
+    auto offset = 0;
+    switch (p.player_num) {
+        case 1:
+            offset = BALL_DIAMETER;
+            break;
+        case 2:
+            offset = WIDTH - BALL_DIAMETER;
+            break;
     }
 
     p.game_ball.x = offset;
@@ -87,22 +90,30 @@ static int placeBall(A &a, Player &p)
 
 static void simBalls(Ball **b)
 {
+
     for (auto i = 0; i < 6; i++)
     {
+        auto bx = b[i];
         for (auto j = 0; j < 6; j++)
         {
             if (i == j)
             {
                 continue;
             }
-            if (b[i]->touches(*b[j]))
+            if (bx->distance(*b[j]) < 1)
             {
-                b[i]->v.x *= -1;
-                b[i]->v.y *= -1;
+                bx->v.x *= -1;
+                bx->v.y *= -1;
             }
         }
-    }
 
+        if (bx->x - BALL_RADIUS <= 0 || bx->x + BALL_RADIUS >= WIDTH) {
+            bx->v *= V_FLIP_H;
+        }
+        if (bx->y - BALL_RADIUS <= 0 || bx->y + BALL_RADIUS >= HEIGHT) {
+            bx->v *= V_FLIP_V;
+        }
+    }
 }
 
 static void fillBallArray(Player &p1, Player &p2, Ball **b)
@@ -122,7 +133,6 @@ void Game::simulate()
     auto i = 0;
 
     if (current_state == PLAY_GAME) {
-        i = 0;
         simBalls(b);
     }
 
@@ -151,6 +161,8 @@ void Game::input(A &a)
         }
         break;
     }
+    a.setCursor(WIDTH /2, 5);
+    a.print(stateChange);
 
     current_state += stateChange;
 }

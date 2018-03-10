@@ -12,7 +12,8 @@ struct Ball : Object
 {
   Ball();
   void draw(A&) override;
-  bool touches(const Ball& b);
+  int16_t distance(const Ball& b);
+  int16_t distance(const Line& l);
   void move();
 
   Vector v;

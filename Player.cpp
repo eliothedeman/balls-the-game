@@ -24,7 +24,7 @@ void Player::draw(A& a)
 
     // print score
     a.setCursor(this->y, this->x);
-    a.print(this->ballState);
+    a.print(this->game_ball.v.x);
 
     switch (ballState)
     {
